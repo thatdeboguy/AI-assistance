@@ -1,0 +1,36 @@
+.chatbox{
+  flex: 1;
+  background-color: rgb(8, 69, 75);
+  position: relative;
+}
+.sidemenu{
+  width: 260px;  
+  padding: 10px;
+  background-color: rgba(7, 37, 35, 0.863);
+}
+.HomePage{
+  background-color: rgba(0, 0, 0, 0.468);
+  text-align: center;
+  display: flex;
+  color: white;
+  position: absolute;
+  top: 0; bottom: 0;right: 0;left: 0;
+}
+.chat-input-holder{  
+  padding: 12px;
+  position: absolute;
+  bottom: 0;
+  left: 0; right: 0;
+
+}
+.chat-input-textarea{
+  padding: 12px;
+  color: white;
+  background-color: rgb(7, 50, 46);
+  border-color: none;
+  border-radius: 5px;
+  border: none;
+  width: 90%;
+  margin: 14px;
+  outline: none;
+}
