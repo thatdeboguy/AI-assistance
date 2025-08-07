@@ -11,24 +11,26 @@ from rest_framework import status
 from rest_framework.views import APIView
 import os
 from django.utils import timezone
-from .document_services import process_document_embedding
+from .document_services import process_document_embedding, get_content
+from PIL import Image
+import pytesseract
+import time
 # Create your views here.
 
 class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all() # a list of users so when we are creating a new user we don't create one that already exist
     serializer_class = Userserializer #Tells this view what kind of data we are going to accept
     permission_classes = [AllowAny] #Who can actually call this class
-
-    
 class DocumentUploadView(APIView):
     parser_classes = (MultiPartParser, FormParser)
     permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
+        start_time = time.time()
         file_obj = request.FILES.get('file')
         if not file_obj:
             return Response(
-                {"error": "No file provided"}, 
+                {"error": "No file provided"},
                 status=status.HTTP_400_BAD_REQUEST
             )        
         # Validate file size (e.g., 200MB limit)
@@ -60,22 +62,33 @@ class DocumentUploadView(APIView):
         document_type = ext_to_type.get(file_ext, 'oth')
         
 
-        try:
+        try:            
+                    
+            document_content, embeddings = get_content(file_obj, document_type)
+            if not document_content or not embeddings:
+                # If no content was extracted, return an error response immediately 
+                return Response(
+                    {"error": "No content or embedding was extracted from the document"},
+                    status=status.HTTP_400_BAD_REQUEST
+                )
             # Upload to MinIO
-            minio_client = MinIOClient()            
-            storage_path = minio_client.upload_file(file_obj, file_name)            
-            
+            minio_client = MinIOClient()       
+            storage_path = minio_client.upload_file(file_obj, file_name)
             # Save metadata to PostgreSQL
             document = Document.objects.create(
                 file_name=file_name,
                 owner=request.user,
                 document_type=document_type,
-                storage_path=storage_path
+                storage_path=storage_path,
+                embedding = embeddings,
+                text_content=document_content,
             )
             # create an embedding
-            document = process_document_embedding(document.id)
+            # document = process_document_embedding(document.id)
             
             serializer = DocumentSerializer(document)
+            elapsed_time = time.time() - start_time
+            print(f"Document processed in {elapsed_time:.2f} seconds")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
             
         except Exception as e:

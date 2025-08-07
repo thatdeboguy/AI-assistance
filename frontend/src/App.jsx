@@ -5,6 +5,7 @@ import Login from "./pages/Login"
 import Register from "./pages/Register"
 import NotFound from "./pages/NotFound"
 import ProtectedRoute from "./components/ProtectedRoute"
+import Upload from "./pages/Upload"
 
 function Logout(){
   localStorage.clear() //This clears both our access_token and refresh_token
@@ -30,7 +31,7 @@ function App() {
       <Route path="/login" element={<Login />}/>
       <Route path="/logout" element={<Logout />}/>
       <Route path="/register" element={<Register />}/>
-
+      <Route path="/test" element={<Upload />}/>
       <Route path="/" element={
         <ProtectedRoute>
           <NotFound />

@@ -1,27 +1,51 @@
-# Logs
-logs
+# General
+.DS_Store
 *.log
+*.swp
+*.swo
+*~
+.vscode/
+.idea/
+
+# Python/Django (backend)
+venv/
+.env
+*.pyc
+__pycache__/
+db.sqlite3
+/media/
+/staticfiles/
+*.sqlite3
+*.pot
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Node/React (frontend)
+node_modules/
+.env
+/.env.local
+/.env.development
+/.env.production
+/build/
+/dist/
+/.next/
+/out/
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
-lerna-debug.log*
+.cache/
+.eslintcache
 
-node_modules
-dist
-dist-ssr
-*.local
+# Database
+/postgres_data/
 
-# Editor directories and files
-.vscode/*
-!.vscode/extensions.json
-.idea
-.DS_Store
+# Editor
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-venv/
-beartell/beartell/.env
-frontend/.env
+# Ignore specific root-level files
+/docker-compose.yml
+/*.txt

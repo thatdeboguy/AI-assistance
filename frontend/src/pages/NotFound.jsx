@@ -73,6 +73,12 @@ const FileUpload = () => {
                     {/* You can add a short link here later */}
                 </div>
             )}
+            <div>   
+                <h1>Query</h1>
+                <p> 
+                    <input type='text' name="query"></input>
+                </p>
+            </div>
         </div>
     );
 };
