@@ -11,7 +11,7 @@ from rest_framework import status
 from rest_framework.views import APIView
 import os
 from django.utils import timezone
-from .document_services import process_document_embedding, get_content
+from .document_services import get_content
 from PIL import Image
 import pytesseract
 import time
@@ -21,6 +21,39 @@ class CreateUserView(generics.CreateAPIView):
     queryset = User.objects.all() # a list of users so when we are creating a new user we don't create one that already exist
     serializer_class = Userserializer #Tells this view what kind of data we are going to accept
     permission_classes = [AllowAny] #Who can actually call this class
+
+class ChatView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, *args, **kwargs):
+        start_time = time.time()
+        user = request.user
+        message = request.data.get('message', '').strip()
+        
+        if not message:
+            return Response(
+                {"error": "Message cannot be empty"},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        documents = Document.objects.filter(owner=user)
+        # scan the documents available from the user and then process the chat message
+        if not documents.exists():
+            return Response(
+                {"error": "No documents found for the user"},
+                status=status.HTTP_404_NOT_FOUND
+            )
+        # Here you would typically process the chat message with the user's documents
+        # Get a response message from the chat processing logic
+        response_message = self.process_chat_message(user, message)
+        
+        elapsed_time = time.time() - start_time
+        print(f"Chat processed in {elapsed_time:.2f} seconds")
+        
+        return Response({"response": response_message}, status=status.HTTP_200_OK)
+
+    def process_chat_message(self, user, message):
+        # Placeholder for actual chat processing logic
+        return f"Processed message from {user.username}: {message}"
 class DocumentUploadView(APIView):
     parser_classes = (MultiPartParser, FormParser)
     permission_classes = [IsAuthenticated]

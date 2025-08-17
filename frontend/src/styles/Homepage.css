@@ -1,22 +1,67 @@
-.chatbox{
-  flex: 1;
-  background-color: rgb(8, 69, 75);
-  position: relative;
-}
-.sidemenu{
-  width: 260px;  
-  padding: 10px;
-  background-color: rgba(7, 37, 35, 0.863);
-}
-.HomePage{
-  background-color: rgba(0, 0, 0, 0.468);
-  text-align: center;
+.panel-container{
   display: flex;
+  background-color: #282c34; 
   color: white;
-  position: absolute;
-  top: 0; bottom: 0;right: 0;left: 0;
+  position:absolute;
+  top:0;bottom:0;right:0;left:0;
+  text-align: center;
+
 }
-.chat-input-holder{  
+
+.sidemenu{
+  width: 260px;
+  background-color: #202123;
+  padding: 40px
+
+}
+.side-menu-adding{
+  padding: 12px;
+  border: 1px solid white;
+  border-radius: 5px;
+  text-align: center;
+  transition: ease 0.25s all;
+}
+.side-menu-adding span{
+  padding-left: 6px;
+  padding-right: 12px;
+}
+.side-menu-adding hover{
+  background-color: rgb(255,255,255, 0.1);
+}
+
+.chatbox {  
+  flex: 1;
+  background-color: #343541;
+  position: relative;
+  
+}
+.chat-log{
+  background-color: #212121;
+  text-align: left;
+} 
+.chat-message{
+  background-color: rgb(255,255,255, 0.1);
+
+}
+.chat-message.You{
+    background-color: #303030;
+    color: white;
+}
+.chat-message.AI{
+    background-color: #171717;
+    color: white;
+} 
+.chat-message-center{
+  max-width: 295px;
+  margin-left: auto;
+  margin-right: auto;
+  padding: 12px;
+  display: flex;
+  padding-left: 40px;
+  padding-right: 40px;
+
+}
+.chat-input-holder{
   padding: 12px;
   position: absolute;
   bottom: 0;
@@ -24,13 +69,63 @@
 
 }
 .chat-input-textarea{
-  padding: 12px;
-  color: white;
-  background-color: rgb(7, 50, 46);
-  border-color: none;
+  background-color: #303030;
+  width: 90%;
   border-radius: 5px;
   border: none;
-  width: 90%;
-  margin: 14px;
+  margin: 12px;
   outline: none;
+  box-shadow: 0 0 8px 0 rgba(0,0,0,0.25);
+  padding: 12px;
+  color: white;
+  font-size: 1.2em;
+}
+
+
+.avatar.AI{
+  background-color: #ececec;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+
+}
+.avatar.You{
+  background-color: #0b93f6;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+}
+.message{
+  padding-left: 40px;
+  padding-right: 40px;
+}
+.popup{
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0,0,0,0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+.popup-content{
+  background-color: #343541;
+  padding: 20px;
+  border-radius: 10px;
+  width: 400px;
+  text-align: center;
+}
+.file-upload-form {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.file-input {
+  padding: 10px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  background-color: #fff;
+  color: #333;
 }

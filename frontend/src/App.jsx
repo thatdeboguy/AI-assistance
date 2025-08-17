@@ -23,7 +23,7 @@ function App() {
     <>
     <BrowserRouter>
     <Routes>
-      <Route path="/upload" element = {
+      <Route path="/" element = {
         <ProtectedRoute>
          <HomePage />
         </ProtectedRoute>
@@ -32,7 +32,7 @@ function App() {
       <Route path="/logout" element={<Logout />}/>
       <Route path="/register" element={<Register />}/>
       <Route path="/test" element={<Upload />}/>
-      <Route path="/" element={
+      <Route path="/upload" element={
         <ProtectedRoute>
           <NotFound />
         </ProtectedRoute>} />

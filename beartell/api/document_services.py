@@ -50,32 +50,6 @@ def generate_embedding(text):
         print(f"Error with openai: {e}")
         raise
 
-
-def process_document_embedding(document_id):
-    """Main function to process and store embeddings"""
-    document = Document.objects.get(id=document_id)
-    try:
-        # 1. Extract text
-        text_content = extract_text_from_document(document.storage_path)
-        if not text_content.strip():
-                raise ValueError("Extracted text is empty")
-        document.text_content = text_content
-        document.save()
-    except ValueError as e:
-        print(f"Text extraction failed for document {document_id}: {str(e)}")
-        return None
-    try:
-        # 2. Generate embedding
-        embedding = generate_embedding(text_content)
-        
-        # 3. Store embedding
-        document.embedding = embedding
-        document.save()
-        
-        return document
-    except Exception as e:
-        print(f"Error processing document {e}")
-
 def find_similar_documents(query_embedding, user, limit=10):
     """Find similar documents for a given embedding"""
     return Document.objects.filter(owner=user).annotate(
@@ -113,3 +87,21 @@ def get_content(file_obj, document_type):
     except Exception as e:
         print(f"Error reading file object: {e}")
         raise
+def process_chat_message(user, message):
+    """Process chat message and return response"""
+    try:
+        # Generate embedding for the message
+        query_embedding = generate_embedding(message)
+        
+        # Find similar documents
+        similar_document = find_similar_documents(query_embedding, user)
+        
+        if similar_document:
+            response = f"Found a relevant document: {similar_document.file_name}"
+        else:
+            response = "No relevant documents found."
+        
+        return response
+    except Exception as e:
+        print(f"Error processing chat message: {e}")
+        return "An error occurred while processing your message."

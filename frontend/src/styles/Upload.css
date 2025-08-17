@@ -1,0 +1,118 @@
+.panel-container{
+  display: flex;
+  background-color: #282c34; 
+  color: white;
+  position:absolute;
+  top:0;bottom:0;right:0;left:0;
+  text-align: center;
+
+}
+
+.sidemenu{
+  width: 260px;
+  background-color: #202123;
+  padding: 40px
+
+}
+.side-menu-adding{
+  padding: 12px;
+  border: 1px solid white;
+  border-radius: 5px;
+  text-align: center;
+  transition: ease 0.25s all;
+}
+.side-menu-adding span{
+  padding-left: 6px;
+  padding-right: 12px;
+}
+/* Chat message styling */
+
+.chatbox {  
+  flex: 1;
+  background-color: #343541;
+  position: relative;
+}
+.chat-message {
+    display: flex;
+    padding: 16px 24px;
+    gap: 16px;
+} 
+.chat-log{
+  background-color: #212121;
+  text-align: left;
+}
+.assistant-message {
+    background-color: #f7f7f8;
+}
+
+.user-message {
+    background-color: white;
+}
+
+.avatar {
+    font-weight: bold;
+    min-width: 40px;
+}
+
+.message {
+    flex: 1;
+    white-space: pre-wrap;
+    line-height: 1.5;
+}
+
+/* Loading indicator */
+.loading .dot {
+    animation: blink 1.4s infinite both;
+    opacity: 0;
+}
+
+.loading .dot:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.loading .dot:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+@keyframes blink {
+    0% { opacity: 0.2; }
+    20% { opacity: 1; }
+    100% { opacity: 0.2; }
+}
+
+/* Input area */
+.chat-input-holder {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 12px;
+}
+
+.chat-input-textarea{
+  background-color: #303030;
+  width: 90%;
+  border-radius: 5px;
+  border: none;
+  margin: 12px;
+  outline: none;
+  box-shadow: 0 0 8px 0 rgba(0,0,0,0.25);
+  padding: 12px;
+  color: white;
+  font-size: 1.2em;
+}
+
+.send-button {
+    position: absolute;
+    right: 24px;
+    bottom: 24px;
+    background: none;
+    border: 1px solid #10a37f;
+    cursor: pointer;
+    color: #10a37f;
+}
+
+.send-button:disabled {
+    color: #ccc;
+    cursor: not-allowed;
+}
