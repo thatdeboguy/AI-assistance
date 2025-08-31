@@ -22,9 +22,16 @@ class DocumentSerializer(serializers.ModelSerializer):
     class Meta:
         model = Document
         fields = [
-            'id', 'file_name', 'owner', 'document_type', 
+            'id', 'file_name', 'owner', 'document_type', 'text_content', 
             'upload_time', 'storage_path'
         ]
+        extra_kwargs = {
+            'owner': {'read_only': True}
+        }
+class DocumentListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Document
+        fields = ['id', 'file_name', 'document_type']
         extra_kwargs = {
             'owner': {'read_only': True}
         }

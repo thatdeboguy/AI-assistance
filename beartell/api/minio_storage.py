@@ -2,7 +2,6 @@ from minio import Minio
 from minio.error import S3Error
 from django.conf import settings
 import os
-#import magic
 import pdfplumber
 import pytesseract
 from PIL import Image
@@ -11,7 +10,7 @@ import io
 from dotenv import load_dotenv
 
 
-load_dotenv()
+load_dotenv('.env.local')  # Load environment variables from .env file
 class MinIOClient:
     def __init__(self):
         self.client = Minio(

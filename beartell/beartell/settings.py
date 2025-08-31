@@ -15,7 +15,7 @@ from datetime import timedelta
 from dotenv import load_dotenv
 import os
 
-load_dotenv()
+load_dotenv('.env.local') # Load environment variables from .env file
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -25,7 +25,9 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'django-insecure--j@uev-+i9p9f#fb=h)#axe_bly71r=e%e*63#@9(3f%xq5*my'
+with open('/run/secrets/django_secretkey') as f:
+    SECRET_KEY = f.read().strip()
+SECRET_KEY = SECRET_KEY
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -96,13 +98,16 @@ WSGI_APPLICATION = 'beartell.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
+with open('/run/secrets/db_password') as f:
+    DB_PASSWORD = f.read().strip()
+
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': os.getenv('DB_NAME'),
         'USER': os.getenv('DB_USER'),
-        'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': 'localhost',
+        'PASSWORD': DB_PASSWORD,
+        'HOST': 'db', # Docker service name for PostgreSQL
         'PORT': '5432',  # Default PostgreSQL port
     }
 }
@@ -152,10 +157,13 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWS_CREDENTIALS = True
 
+with open('/run/secrets/minio_secretkey') as f:
+    SECRET_KEY = f.read().strip()
+
 # MinIO Configuration
 MINIO_ENDPOINT = os.getenv('MINIO_ENDPOINT', 'localhost:9000')
 MINIO_ACCESS_KEY = os.getenv('MINIO_ACCESS_KEY')
-MINIO_SECRET_KEY = os.getenv('MINIO_SECRET_KEY')
+MINIO_SECRET_KEY = SECRET_KEY
 MINIO_USE_HTTPS = os.getenv('MINIO_USE_HTTPS', 'False') == 'True'
 MINIO_BUCKET_NAME = os.getenv('MINIO_BUCKET_NAME')
 
@@ -167,4 +175,6 @@ ALLOWED_FILE_TYPES = [
     'mp4', 'mov', 'avi', 'zip', 'rar'
 ]
 PGVECTOR_VECTOR_SIZE = 1536 
-OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+with open('/run/secrets/openai_key') as f:
+    OPENAI_API_KEY = f.read().strip()
+OPENAI_API_KEY = OPENAI_API_KEY

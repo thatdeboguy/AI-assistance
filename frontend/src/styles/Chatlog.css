@@ -1,0 +1,35 @@
+@import "tailwindcss";
+
+.chat-log{
+  background-color: #292525;
+  text-align: left;
+  height: calc(100vh - 160px); /* Adjust based on your layout */
+  overflow-y: auto; /* Enable vertical scrolling */
+  padding: 20px; /* Optional padding for better readability */
+}
+
+/* Streaming cursor animation */
+.streaming-cursor {
+    animation: blink 1s infinite;
+    font-weight: bold;
+}
+
+@keyframes blink {
+    0%, 50% { opacity: 1; }
+    51%, 100% { opacity: 0; }
+}
+
+/* Ensure messages are properly aligned */
+.chat-message.assistant-message {
+    display: flex;
+    padding: 16px 24px;
+    gap: 16px;
+    background-color: #0a0a5c;
+}
+
+.chat-message.user-message {
+    display: flex;
+    padding: 16px 24px;
+    gap: 16px;
+    background-color: #4a004a;
+}
