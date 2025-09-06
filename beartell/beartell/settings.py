@@ -25,9 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.2/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-with open('/run/secrets/django_secretkey') as f:
-    SECRET_KEY = f.read().strip()
-SECRET_KEY = SECRET_KEY
+SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -98,8 +96,14 @@ WSGI_APPLICATION = 'beartell.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.2/ref/settings/#databases
 
-with open('/run/secrets/db_password') as f:
-    DB_PASSWORD = f.read().strip()
+
+# Database
+DB_PASSWORD_FILE = os.getenv('DB_PASSWORD_FILE')
+if DB_PASSWORD_FILE:
+    with open(DB_PASSWORD_FILE) as f:
+        DB_PASSWORD = f.read().strip()
+else:
+    DB_PASSWORD = os.getenv('DB_PASSWORD')
 
 DATABASES = {
     'default': {
@@ -107,8 +111,8 @@ DATABASES = {
         'NAME': os.getenv('DB_NAME'),
         'USER': os.getenv('DB_USER'),
         'PASSWORD': DB_PASSWORD,
-        'HOST': 'db', # Docker service name for PostgreSQL
-        'PORT': '5432',  # Default PostgreSQL port
+        'HOST': 'localhost',  # Docker service name for PostgreSQL
+        'PORT': '5432',
     }
 }
 
@@ -157,13 +161,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 CORS_ALLOW_ALL_ORIGINS = True
 CORS_ALLOWS_CREDENTIALS = True
 
-with open('/run/secrets/minio_secretkey') as f:
-    SECRET_KEY = f.read().strip()
 
-# MinIO Configuration
+
+# MinIO
+MINIO_SECRET_KEY_FILE = os.getenv('MINIO_SECRET_KEY_FILE')
+if MINIO_SECRET_KEY_FILE:
+    with open(MINIO_SECRET_KEY_FILE) as f:
+        MINIO_SECRET_KEY = f.read().strip()
+else:
+    MINIO_SECRET_KEY = os.getenv('MINIO_SECRET_KEY')
+
 MINIO_ENDPOINT = os.getenv('MINIO_ENDPOINT', 'localhost:9000')
 MINIO_ACCESS_KEY = os.getenv('MINIO_ACCESS_KEY')
-MINIO_SECRET_KEY = SECRET_KEY
 MINIO_USE_HTTPS = os.getenv('MINIO_USE_HTTPS', 'False') == 'True'
 MINIO_BUCKET_NAME = os.getenv('MINIO_BUCKET_NAME')
 
@@ -175,6 +184,9 @@ ALLOWED_FILE_TYPES = [
     'mp4', 'mov', 'avi', 'zip', 'rar'
 ]
 PGVECTOR_VECTOR_SIZE = 1536 
-with open('/run/secrets/openai_key') as f:
-    OPENAI_API_KEY = f.read().strip()
-OPENAI_API_KEY = OPENAI_API_KEY
+OPENAI_KEY_FILE = os.getenv('OPENAI_API_KEY_FILE')
+if OPENAI_KEY_FILE:
+    with open(OPENAI_KEY_FILE) as f:
+        OPENAI_API_KEY = f.read().strip()
+else:
+    OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')

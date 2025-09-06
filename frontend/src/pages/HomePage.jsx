@@ -1,9 +1,7 @@
 import { useState, useRef, useEffect, use } from "react";
 import api from '../api'
 import "../styles/HomePage.css"
-import "../styles/Normalize.css"
 import Message from "../components/Chatlog";
-import { Link } from 'react-router-dom';
 import LoadingIndicator from "../components/LoadingIndicator" 
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constsnts";
 
@@ -228,57 +226,54 @@ function HomePage() {
                 
             </aside>
 
-            <section className="chatbox">
-                <div className="chat-log">
-                    {chatlog.map((message, index) => (
-                        <Message key= {index} message = {message}/>
-                    ))}
+            <div className="chatbox"> 
+                <div className="chat-log"> 
+                        {chatlog.map((message, index) => (
+                            <Message key= {index} message = {message}/>
+                        ))}
+                        
                     
-                </div>  
-                {popupaddfile && (
-                    <div className="popup-overlay">
-                        <div className="popup-box">
-                        <div className="popup-header">
-                            <h2>Add a File</h2>
-                            <button className="close-popup" onClick={() => setPopupAddFile(false)}>✕</button>
-                        </div>
+                    {popupaddfile && (
+                        <div className="popup-overlay">
+                            <div className="popup-box">
+                            <div className="popup-header">
+                                <h2>Add a File</h2>
+                                <button className="close-popup" onClick={() => setPopupAddFile(false)}>✕</button>
+                            </div>
 
-                        <form onSubmit={handleFileSubmit} className="popup-form">
-                            <input 
-                            type="file" 
-                            accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
-                            onChange={(e) => setFile(e.target.files[0])}
-                            className="file-input"
-                            />
-                            {isLoading && <LoadingIndicator />}
-                            <button type="submit" className="upload-button">Upload</button>
-                        </form>
+                            <form onSubmit={handleFileSubmit} className="popup-form">
+                                <input 
+                                type="file" 
+                                accept=".pdf,.doc,.docx,.txt,.jpg,.jpeg,.png"
+                                onChange={(e) => setFile(e.target.files[0])}
+                                className="file-input"
+                                />
+                                {isLoading && <LoadingIndicator />}
+                                <button type="submit" className="upload-button">Upload</button>
+                            </form>
+                            </div>
                         </div>
+                        )}                          
+                    <div className="chat-input-holder">
+                        <form onSubmit={handleSubmit} className="chat-input-form">
+                            <input
+                                type="text"
+                                ref={textareaRef}
+                                className="chat-input-textarea"
+                                placeholder="Start Typing..."
+                                rows="1"
+                                value={inputValue}
+                                onChange={(e) => setInputValue(e.target.value)}
+                                onKeyDown={handleKeyDown}
+                                disabled={isLoading}
+                            />
+                            <div className="input-group-append" onClick={handleSubmit}>
+                                <span className="input-group-text send-icon"><i className="bi bi-send"></i></span>
+                            </div>
+                        </form>
                     </div>
-                    )}                          
-                <div className="chat-input-holder">
-                    <form onSubmit={handleSubmit}>
-                        <input
-                            type="text"
-                            ref={textareaRef}
-                            className="chat-input-textarea"
-                            placeholder="Start Typing..."
-                            rows="1"
-                            value={inputValue}
-                            onChange={(e) => setInputValue(e.target.value)}
-                            onKeyDown={handleKeyDown}
-                            disabled={isLoading}
-                        />
-                        {/* <button 
-                            type="submit" 
-                            className="send-button"
-                            disabled={!inputValue.trim() || isLoading}
-                        >
-                            Send
-                        </button> */}
-                    </form>
                 </div>
-            </section>
+            </div>
         </div>
     );
 }
