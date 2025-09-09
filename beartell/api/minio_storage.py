@@ -31,6 +31,7 @@ class MinIOClient:
 
     def upload_file(self, file_object, file_name):
         try:
+            print(f"Uploading file: {file_name} to bucket: {self.bucket_name}")
             self.ensure_bucket_exists()
             # Universal file size detection
             # Reset file pointer to start (critical for re-reading)

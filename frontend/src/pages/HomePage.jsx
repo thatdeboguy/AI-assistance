@@ -40,12 +40,15 @@ function HomePage() {
     }, [chatlog]);
 
     // Auto-resize textarea based on content
-    useEffect(() => {
+    const handleInputChange = (e) => {
+        setInputValue(e.target.value);
+
+        // Auto-resize textarea
         if (textareaRef.current) {
-            textareaRef.current.style.height = 'auto';
-            textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+            textareaRef.current.style.height = "auto"; // Reset height
+            textareaRef.current.style.height = textareaRef.current.scrollHeight + "px"; // Set new height
         }
-    }, [inputValue]);
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -256,14 +259,14 @@ function HomePage() {
                         )}                          
                     <div className="chat-input-holder">
                         <form onSubmit={handleSubmit} className="chat-input-form">
-                            <input
+                            <textarea
                                 type="text"
                                 ref={textareaRef}
                                 className="chat-input-textarea"
                                 placeholder="Start Typing..."
                                 rows="1"
                                 value={inputValue}
-                                onChange={(e) => setInputValue(e.target.value)}
+                                onChange={handleInputChange}
                                 onKeyDown={handleKeyDown}
                                 disabled={isLoading}
                             />

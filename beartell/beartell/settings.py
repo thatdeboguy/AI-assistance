@@ -28,7 +28,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = os.getenv('DJANGO_SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
 ALLOWED_HOSTS = ["*"] # Set to your domain or IP address in production
 
@@ -164,15 +164,16 @@ CORS_ALLOWS_CREDENTIALS = True
 
 
 # MinIO
-MINIO_SECRET_KEY_FILE = os.getenv('MINIO_SECRET_KEY_FILE')
-if MINIO_SECRET_KEY_FILE:
-    with open(MINIO_SECRET_KEY_FILE) as f:
-        MINIO_SECRET_KEY = f.read().strip()
-else:
-    MINIO_SECRET_KEY = os.getenv('MINIO_SECRET_KEY')
+# MINIO_SECRET_KEY_FILE = os.getenv('MINIO_SECRET_KEY_FILE')
+# if MINIO_SECRET_KEY_FILE:
+#     with open(MINIO_SECRET_KEY_FILE) as f:
+#         MINIO_SECRET_KEY = f.read().strip()
+# else:
+#     MINIO_SECRET_KEY = os.getenv('MINIO_SECRET_KEY')
 
 MINIO_ENDPOINT = os.getenv('MINIO_ENDPOINT', 'localhost:9000')
 MINIO_ACCESS_KEY = os.getenv('MINIO_ACCESS_KEY')
+MINIO_SECRET_KEY = os.getenv('MINIO_SECRET_KEY')
 MINIO_USE_HTTPS = os.getenv('MINIO_USE_HTTPS', 'False') == 'True'
 MINIO_BUCKET_NAME = os.getenv('MINIO_BUCKET_NAME')
 
@@ -183,7 +184,7 @@ ALLOWED_FILE_TYPES = [
     'txt', 'jpg', 'jpeg', 'png', 'gif', 'mp3', 'wav',
     'mp4', 'mov', 'avi', 'zip', 'rar'
 ]
-PGVECTOR_VECTOR_SIZE = 1536 
+PGVECTOR_VECTOR_SIZE = 384 
 OPENAI_KEY_FILE = os.getenv('OPENAI_API_KEY_FILE')
 if OPENAI_KEY_FILE:
     with open(OPENAI_KEY_FILE) as f:
