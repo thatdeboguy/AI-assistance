@@ -19,7 +19,3 @@ pytesseract
 Pillow
 tiktoken
 langchain
-langchain_community
-sentence-transformers
-ollama
-langchain-ollama
