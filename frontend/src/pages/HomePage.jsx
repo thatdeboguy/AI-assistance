@@ -280,29 +280,28 @@ function HomePage() {
                             </form>
                             </div>
                         </div>
-                        )}   
-                </div>                       
-                <div className="chat-input-holder">
-                    <form onSubmit={handleSubmit} className="chat-input-form">
-                        <textarea
-                            type="text"
-                            ref={textareaRef}
-                            className="chat-input-textarea"
-                            placeholder="Start Typing..."
-                            rows="1"
-                            value={inputValue}
-                            onChange={handleInputChange}
-                            onKeyDown={handleKeyDown}
-                            disabled={isLoading}
-                        />
-                        <div className="input-group-append" onClick={handleSubmit}>
-                            <span className="input-group-text send-icon"><i className="bi bi-send"></i></span>
-                        </div>
-                    </form>
-                </div>                
+                        )}                          
+                    <div className="chat-input-holder">
+                        <form onSubmit={handleSubmit} className="chat-input-form">
+                            <textarea
+                                type="text"
+                                ref={textareaRef}
+                                className="chat-input-textarea"
+                                placeholder="Start Typing..."
+                                rows="1"
+                                value={inputValue}
+                                onChange={handleInputChange}
+                                onKeyDown={handleKeyDown}
+                                disabled={isLoading}
+                            />
+                            <div className="input-group-append" onClick={handleSubmit}>
+                                <span className="input-group-text send-icon"><i className="bi bi-send"></i></span>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
     );
 }
 

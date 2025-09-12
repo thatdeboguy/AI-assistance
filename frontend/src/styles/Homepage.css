@@ -178,10 +178,27 @@ html, body, #root {
   padding: 8px 15px;
   border-radius: 5px;
   color: white;
-  cursor: pointer;
+  padding: 40px;
+  font: 100% Arial, Helvetica, sans-serif;
+
 }
 
 
+.chatbox {  
+  padding: 0 0 50px 0;
+  color: white;
+  position: relative;
+  flex: 3;
+  
+}
+.chat-log{
+  border: 1px solid #ccc;
+  overflow: hidden;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  background-color: white;
+  text-align: left;
+} 
 
 
 .chat-input-holder{

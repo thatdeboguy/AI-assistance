@@ -43,5 +43,10 @@ class DocumentChunk(models.Model):
     chunk_index = models.IntegerField()
     content = models.TextField(null=True, blank=True)
     embedding = VectorField(dimensions=1536, null=True, blank=True)
+class DocumentChunk(models.Model):
+    document = models.ForeignKey(Document, on_delete=models.CASCADE, related_name="chunks")
+    chunk_index = models.IntegerField()
+    content = models.TextField(null=True, blank=True)
+    embedding = VectorField(dimensions=384, null=True, blank=True)
 
 

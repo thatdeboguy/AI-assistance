@@ -11,18 +11,23 @@ from rest_framework import status
 from rest_framework.views import APIView
 import os
 from django.utils import timezone
-from pgvector.django import L2Distance
 from .document_services import get_content, generate_embedding
 from PIL import Image
 from django.http import StreamingHttpResponse
-import json
+import json, ollama
+from pgvector.django import L2Distance
 import time
 import openai
 from django.conf import settings
+import requests
+from langchain_core.prompts import ChatPromptTemplate
+from langchain_ollama import OllamaLLM
 
-EMBEDDING_MODEL = "text-embedding-3-small"
-openai.api_key = settings.OPENAI_API_KEY
-encoding_name = "cl100k_base"
+
+model = OllamaLLM(model="mistral", base_url="http://localhost:11434")
+
+
+
 
 # Create your views here.
 
@@ -33,6 +38,7 @@ class CreateUserView(generics.CreateAPIView):
 
 
 class ChatView(APIView):
+    # This view handles chat messages and returns responses, optionally using RAG with documents.
     permission_classes = [IsAuthenticated]
     def post(self, request, *args, **kwargs):
         user = request.user
@@ -48,19 +54,19 @@ class ChatView(APIView):
             )  
         
         if document_ids:            
-            # Return a streaming response
+            # Return a streaming response with document selected
             return StreamingHttpResponse(
-                self.stream_document_chat_response(user, message, chat_log, document_ids),
+                self.stream_response_with_document(user, message, chat_log, document_ids),
                 content_type='text/event-stream'
             )
         else:
-            # Original non-streaming logic
+            # Return a streaming response without document selected
             return StreamingHttpResponse(
-                self.non_streaming_response(user, message, chat_log),
+                self.stream_response_without_document(user, message, chat_log),
                 content_type='text/event-stream'
             )
     
-    def stream_document_chat_response(self, user, message, chat_log, document_ids):
+    def stream_response_with_document(self, user, user_query, chat_log, document_ids):
         """Generator function for streaming responses"""
         start_time = time.time()
         # RAG logic with documents
@@ -70,7 +76,7 @@ class ChatView(APIView):
             return
         
         try:
-            query_embedding = generate_embedding(message)
+            query_embedding = generate_embedding(user_query)
             similar_docs = documents.annotate(
                 distance=L2Distance('embedding', query_embedding)
             ).order_by('distance')[:3]
@@ -79,85 +85,89 @@ class ChatView(APIView):
                 return  
             # Prepare the context from the documents
             context = "\n\n".join([doc.content for doc in similar_docs if doc.content])
-                        
-            system_prompt = f"""You are a helpful AI assistant that provides answers based on the provided context.
-
-            Context from user's documents:{context}
-
-            Please answer the user's question based on the context above. If the context doesn't contain relevant information, say so politely."""
-            # Prepare messages for OpenAI
-            messages = [{"role": "system", "content": system_prompt}]
+            if not context:
+                yield f"data: {json.dumps({'error': 'No content found in similar documents'})}\n\n"
+                return                       
             
+            messages = ""
+            messages += f"role : system, content: Hello! How can I help you today?\n"           
             # Add only the last few messages to avoid token limits
             recent_history = chat_log[-6:]  # Keep last 3 exchanges (6 messages)
             for msg in recent_history:
-                messages.append({"role": msg.get('role', 'user'), "content": msg.get('content', '')})
-                
-                # Add the current query
-            messages.append({"role": "user", "content": message})
+                messages +=f"role: {msg.get('role', 'user')}, content: {msg.get('content', '')}"
+            messages += f"\nrole: user, content: {user_query}"
+            print(f"RAG chat messages: {messages}")
 
-            response = openai.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=messages,
-                temperature=0.2,
-                max_tokens=1024,
-                stream=True  # Enable streaming
-            )
-            
-            # Stream the response
-            full_response = ""
-            for chunk in response:
-                
-                if chunk.choices[0].delta.content is not None:
-                    content = chunk.choices[0].delta.content
-                    full_response += content
-                    
-                    # Send each chunk to the client
-                    yield f"data: {json.dumps({'content': content})}\n\n"
+            template = f"""You are a helpful AI assistant that provides answers based on the provided context.
+
+            Context from user's documents:{context}
+            Here is the conversation history: {messages}
+
+            Please answer the user's question based on the context above. If the context doesn't contain relevant information, say so politely.            
+            Question:  {user_query}
+            """
+            try:
+                system_prompt = ChatPromptTemplate.from_template(template)
+                chain = system_prompt | model
+                response = chain.invoke({"context": messages, "question": user_query})
+            except Exception as e:
+                error_msg = f"Error invoking model: {str(e)}"
+                print(error_msg)
+                yield f"data: {json.dumps({'error': error_msg})}\n\n"
+                return
+            generated_time = time.time() - start_time
+            print(f"Generated RAG prompt in {generated_time:.2f} seconds")
+            if response:
+                print("RAG chat, starting to stream...")
+            # 🔹 Parse stream properly
+            yield f"data: {json.dumps({'content': str(response)})}\n\n"
             elapsed_time = time.time() - start_time
             print(f"RAG response processed in {elapsed_time:.2f} seconds")
         except Exception as e:
             print(f"Error: {e}")
             error_msg = f"Error: {str(e)}"
+            print(error_msg)
             yield f"data: {json.dumps({'error': error_msg})}\n\n"
             return
     
-    def non_streaming_response(self, user, message, chat_log):
-        """Handle non-streaming requests (your original logic)"""
-        # Your existing non-streaming logic here
-        
-        # RAG logic with documents
+    def stream_response_without_document(self, user, user_query, chat_log):
+        """Handle streaming requests without documents"""
+
         
         start_time = time.time()
-        system_prompt = """You are a helpful AI assistant. """
-        messages = [{"role": "system", "content": system_prompt}]
-        try:
-            # Add only the last few messages to avoid token limits
-            recent_history = chat_log[-6:]  # Keep last 3 exchanges (6 messages)
-            for msg in recent_history:
-                messages.append({"role": msg.get('role', 'user'), "content": msg.get('content', '')})
+        messages = ""
+        recent_history = chat_log[-6:]  # Keep last 3 exchanges (6 messages)
+        for msg in recent_history:
+            messages +=f"role: {msg.get('role', 'user')}, content: {msg.get('content', '')}"
+        messages += f"\nrole: user, content: {user_query}"
+        print(f"RAG chat messages: {messages}")
 
-            messages.append({"role": "user", "content": message})
+        system_prompt = f"""You are a helpful AI assistant that provides answers based on the provided context.
+        Here is the conversation history:{messages}
+        Please answer the user's question based on the context above. If the context doesn't contain relevant information, say so politely.
+        Question:  {user_query}
+            """
+        try:          
 
-            response = openai.chat.completions.create(
-                model="gpt-3.5-turbo",
-                messages=messages,
-                temperature=0.2,
-                max_tokens=1024,
-                stream=True  # Enable streaming
-            )
+            response = requests.post("http://localhost:11434/api/generate",
+                                     json={"model": "mistral",
+                                           "prompt": system_prompt,                                            
+                                           "stream": True},
+                                            stream=True
+                                           )
             if response: 
                 print("standard chat, starting to stream...")
             # Stream the response
-            full_response = ""
-            for chunk in response:
-                
-                if chunk.choices[0].delta.content is not None:
-                    content = chunk.choices[0].delta.content
-                    full_response += content
-                    
-                    # Send each chunk to the client
-                    yield f"data: {json.dumps({'content': content})}\n\n"
+            for line in response.iter_lines():
+                if line:
+                    try:
+                        data = json.loads(line.decode("utf-8"))
+                        if "response" in data:
+                            yield f"data: {json.dumps({'content': data['response']})}\n\n"
+                        if data.get("done"):
+                            break
+                    except json.JSONDecodeError:
+                        continue
             elapsed_time = time.time() - start_time
             print(f"Chat response processed in {elapsed_time:.2f} seconds")
         except Exception as e:
@@ -223,7 +233,10 @@ class DocumentUploadView(APIView):
 
         try:            
             print(f"Processing file: {file_name} of type {document_type}")
+            # create an embedding and get the text content of the document
             document_content, embeddings = get_content(file_obj, document_type)
+            #document_content = text xontent of the document
+            #embeddings = list of (chunk, embedding) pairs e.g [(chunk1, emb1), (chunk2, emb2)]
             if not document_content or not embeddings:
                 # If no content was extracted, return an error response immediately 
                 return Response(
@@ -231,19 +244,19 @@ class DocumentUploadView(APIView):
                     status=status.HTTP_400_BAD_REQUEST
                 )
             # Upload to MinIO
+            
             minio_client = MinIOClient()       
             storage_path = minio_client.upload_file(file_obj, file_name)
-            # Save metadata to PostgreSQL
+            # Save chunks and embeddings to the database
+            print("Saving document and chunks to the database...")
             document = Document.objects.create(
                 file_name=file_name,
                 owner=request.user,
                 upload_time=timezone.now(),
                 document_type=document_type,
                 storage_path=storage_path,
-                text_content=document_content,
-            )
-            # create an embedding
-            # document = process_document_embedding(document.id)
+                text_content=document_content
+                )
             for idx, (chunk, embedding) in enumerate(embeddings):
                 DocumentChunk.objects.create(
                     #store document id not the whole object
@@ -252,6 +265,7 @@ class DocumentUploadView(APIView):
                     content=chunk,
                     embedding=embedding
                 ) 
+            
             serializer = DocumentSerializer(document)
             elapsed_time = time.time() - start_time
             print(f"Document processed in {elapsed_time:.2f} seconds")

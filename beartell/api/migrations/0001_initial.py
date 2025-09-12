@@ -24,7 +24,7 @@ class Migration(migrations.Migration):
                 ('upload_time', models.DateTimeField(default=django.utils.timezone.now)),
                 ('document_type', models.CharField(choices=[('pdf', 'PDF'), ('doc', 'Word'), ('ppt', 'PowerPoint'), ('xls', 'Excel'), ('txt', 'Text'), ('img', 'Image'), ('aud', 'Audio'), ('vid', 'Video'), ('arc', 'Archive'), ('oth', 'Other')], max_length=3)),
                 ('storage_path', models.CharField(max_length=512)),
-                ('embedding', pgvector.django.vector.VectorField(blank=True, dimensions=1536, null=True)),
+                ('embedding', pgvector.django.vector.VectorField(blank=True, dimensions=384, null=True)),
                 ('text_content', models.TextField(blank=True, null=True)),
                 ('owner', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='documets', to=settings.AUTH_USER_MODEL)),
             ],
