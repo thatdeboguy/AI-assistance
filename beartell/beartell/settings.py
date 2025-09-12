@@ -15,7 +15,7 @@ from datetime import timedelta
 from dotenv import load_dotenv
 import os
 
-load_dotenv('.env.local') # Load environment variables from .env file
+load_dotenv('.env') # Load environment variables from .env file
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -98,19 +98,19 @@ WSGI_APPLICATION = 'beartell.wsgi.application'
 
 
 # Database
-DB_PASSWORD_FILE = os.getenv('DB_PASSWORD_FILE')
-if DB_PASSWORD_FILE:
-    with open(DB_PASSWORD_FILE) as f:
-        DB_PASSWORD = f.read().strip()
-else:
-    DB_PASSWORD = os.getenv('DB_PASSWORD')
+# DB_PASSWORD_FILE = os.getenv('DB_PASSWORD_FILE')
+# if DB_PASSWORD_FILE:
+#     with open(DB_PASSWORD_FILE) as f:
+#         DB_PASSWORD = f.read().strip()
+# else:
+#     DB_PASSWORD = os.getenv('DB_PASSWORD')
 
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
         'NAME': os.getenv('DB_NAME'),
         'USER': os.getenv('DB_USER'),
-        'PASSWORD': DB_PASSWORD,
+        'PASSWORD': os.getenv('DB_PASSWORD'),
         'HOST': 'localhost',  # Docker service name for PostgreSQL
         'PORT': '5432',
     }
@@ -164,12 +164,12 @@ CORS_ALLOWS_CREDENTIALS = True
 
 
 # MinIO
-MINIO_SECRET_KEY_FILE = os.getenv('MINIO_SECRET_KEY_FILE')
-if MINIO_SECRET_KEY_FILE:
-    with open(MINIO_SECRET_KEY_FILE) as f:
-        MINIO_SECRET_KEY = f.read().strip()
-else:
-    MINIO_SECRET_KEY = os.getenv('MINIO_SECRET_KEY')
+# MINIO_SECRET_KEY_FILE = os.getenv('MINIO_SECRET_KEY_FILE')
+# if MINIO_SECRET_KEY_FILE:
+#     with open(MINIO_SECRET_KEY_FILE) as f:
+#         MINIO_SECRET_KEY = f.read().strip()
+# else:
+#     MINIO_SECRET_KEY = os.getenv('MINIO_SECRET_KEY')
 
 MINIO_ENDPOINT = os.getenv('MINIO_ENDPOINT', 'localhost:9000')
 MINIO_ACCESS_KEY = os.getenv('MINIO_ACCESS_KEY')
@@ -184,9 +184,9 @@ ALLOWED_FILE_TYPES = [
     'mp4', 'mov', 'avi', 'zip', 'rar'
 ]
 PGVECTOR_VECTOR_SIZE = 1536 
-OPENAI_KEY_FILE = os.getenv('OPENAI_API_KEY_FILE')
-if OPENAI_KEY_FILE:
-    with open(OPENAI_KEY_FILE) as f:
-        OPENAI_API_KEY = f.read().strip()
-else:
-    OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')
+# OPENAI_KEY_FILE = os.getenv('OPENAI_API_KEY_FILE')
+# if OPENAI_KEY_FILE:
+#     with open(OPENAI_KEY_FILE) as f:
+#         OPENAI_API_KEY = f.read().strip()
+# else:
+OPENAI_API_KEY = os.getenv('OPENAI_API_KEY')

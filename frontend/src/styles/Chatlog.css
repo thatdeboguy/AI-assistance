@@ -1,26 +1,40 @@
-/* Streaming cursor animation */
+.chat-message {
+  display: flex;
+  margin-bottom: 8px;
+}
+
+.user-message {
+  justify-content: flex-end;
+}
+
+.assistant-message {
+  justify-content: flex-start;
+}
+
+.message {
+  max-width: 70%;
+  padding: 10px 14px;
+  border-radius: 12px;
+  white-space: pre-wrap;
+}
+
+.user-message .message {
+  background-color: #007bff;
+  color: white;
+}
+
+.assistant-message .message {
+  background-color: #f1f1f1;
+  color: black;
+}
+
 .streaming-cursor {
-    animation: blink 1s infinite;
-    font-weight: bold;
+  display: inline-block;
+  animation: blink 1s step-start infinite;
 }
 
 @keyframes blink {
-    0%, 50% { opacity: 1; }
-    51%, 100% { opacity: 0; }
-}
-
-/* Ensure messages are properly aligned */
-.chat-message.assistant-message {
-    padding: 30px 15px 0 25px;
-    border: 1px solid #e0e0e0;
-    border-radius: 1px;
-    
-}
-
-.chat-message.user-message {
-    padding: 30px 15px 0 25px;
-}
-.message{
-    max-height: 500px;
-    overflow-y: auto;
+  50% {
+    opacity: 0;
+  }
 }

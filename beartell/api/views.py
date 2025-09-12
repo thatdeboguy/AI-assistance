@@ -2,7 +2,7 @@ from django.shortcuts import render
 from django.contrib.auth.models import User
 from .minio_storage import MinIOClient
 from .serializers import Userserializer, DocumentSerializer, DocumentListSerializer
-from .models import Document
+from .models import Document, DocumentChunk
 from rest_framework.parsers import MultiPartParser, FormParser
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework import generics
@@ -11,7 +11,8 @@ from rest_framework import status
 from rest_framework.views import APIView
 import os
 from django.utils import timezone
-from .document_services import get_content, generate_embedding, find_similar_documents, generate_rag_response, process_chat_message
+from pgvector.django import L2Distance
+from .document_services import get_content, generate_embedding
 from PIL import Image
 from django.http import StreamingHttpResponse
 import json
@@ -63,19 +64,21 @@ class ChatView(APIView):
         """Generator function for streaming responses"""
         start_time = time.time()
         # RAG logic with documents
-        documents = Document.objects.filter(owner=user, id__in=document_ids)
+        documents = DocumentChunk.objects.filter(document__owner=user, document__id__in=document_ids)
         if not documents.exists():
             yield f"data: {json.dumps({'error': 'No documents found for the user'})}\n\n"
             return
         
         try:
             query_embedding = generate_embedding(message)
-            similar_docs = find_similar_documents(query_embedding, user, 1)
+            similar_docs = documents.annotate(
+                distance=L2Distance('embedding', query_embedding)
+            ).order_by('distance')[:3]
             if not similar_docs:    
                 yield f"data: {json.dumps({'error': 'No similar documents found'})}\n\n"
                 return  
             # Prepare the context from the documents
-            context = "\n\n".join([doc.text_content for doc in similar_docs])
+            context = "\n\n".join([doc.content for doc in similar_docs if doc.content])
                         
             system_prompt = f"""You are a helpful AI assistant that provides answers based on the provided context.
 
@@ -114,6 +117,7 @@ class ChatView(APIView):
             elapsed_time = time.time() - start_time
             print(f"RAG response processed in {elapsed_time:.2f} seconds")
         except Exception as e:
+            print(f"Error: {e}")
             error_msg = f"Error: {str(e)}"
             yield f"data: {json.dumps({'error': error_msg})}\n\n"
             return
@@ -233,20 +237,28 @@ class DocumentUploadView(APIView):
             document = Document.objects.create(
                 file_name=file_name,
                 owner=request.user,
+                upload_time=timezone.now(),
                 document_type=document_type,
                 storage_path=storage_path,
-                embedding = embeddings,
                 text_content=document_content,
             )
             # create an embedding
             # document = process_document_embedding(document.id)
-            
+            for idx, (chunk, embedding) in enumerate(embeddings):
+                DocumentChunk.objects.create(
+                    #store document id not the whole object
+                    document=document,
+                    chunk_index=idx,
+                    content=chunk,
+                    embedding=embedding
+                ) 
             serializer = DocumentSerializer(document)
             elapsed_time = time.time() - start_time
             print(f"Document processed in {elapsed_time:.2f} seconds")
             return Response(serializer.data, status=status.HTTP_201_CREATED)
             
         except Exception as e:
+            print(f"Error processing document: {e}")
             return Response(
                 {"error": str(e)}, 
                 status=status.HTTP_500_INTERNAL_SERVER_ERROR

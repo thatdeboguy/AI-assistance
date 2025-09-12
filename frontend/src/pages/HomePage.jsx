@@ -4,6 +4,7 @@ import "../styles/HomePage.css"
 import Message from "../components/Chatlog";
 import LoadingIndicator from "../components/LoadingIndicator" 
 import { ACCESS_TOKEN, REFRESH_TOKEN } from "../constsnts";
+import { Navigate } from "react-router-dom"
 
 
 function HomePage() {
@@ -40,12 +41,15 @@ function HomePage() {
     }, [chatlog]);
 
     // Auto-resize textarea based on content
-    useEffect(() => {
+    const handleInputChange = (e) => {
+        setInputValue(e.target.value);
+
+        // Auto-resize textarea
         if (textareaRef.current) {
-            textareaRef.current.style.height = 'auto';
-            textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+            textareaRef.current.style.height = "auto"; // Reset height
+            textareaRef.current.style.height = textareaRef.current.scrollHeight + "px"; // Set new height
         }
-    }, [inputValue]);
+    };
 
     const handleSubmit = async (e) => {
         e.preventDefault();
@@ -189,9 +193,32 @@ function HomePage() {
 
         fetchDocuments();
     }, [popupaddfile]);
+    const handleLogout = (e) => {
+    e.preventDefault();
+    
+    // Clear authentication tokens
+    localStorage.clear()
+    
+    // Clear chat state if needed
+    setchatlog([]);
+    
+    // Redirect to login page
+    window.location.href = '/login';
+    };
 
     return (
+    <div className="homepage-container">
+        <header className="header">
+            <div className="header-content">
+                <a href="/login" className="logout-link" onClick={handleLogout}>
+                    Logout
+                </a>
+                <h1 className="app-title">AI Chat Application</h1>
+                
+            </div>
+        </header>
         <div className="panel-container">
+            
             <aside className="sidemenu">
                 <h1>Resources</h1>
                 <button className="add-file"  onClick={() => setPopupAddFile(true)}>
@@ -253,28 +280,29 @@ function HomePage() {
                             </form>
                             </div>
                         </div>
-                        )}                          
-                    <div className="chat-input-holder">
-                        <form onSubmit={handleSubmit} className="chat-input-form">
-                            <input
-                                type="text"
-                                ref={textareaRef}
-                                className="chat-input-textarea"
-                                placeholder="Start Typing..."
-                                rows="1"
-                                value={inputValue}
-                                onChange={(e) => setInputValue(e.target.value)}
-                                onKeyDown={handleKeyDown}
-                                disabled={isLoading}
-                            />
-                            <div className="input-group-append" onClick={handleSubmit}>
-                                <span className="input-group-text send-icon"><i className="bi bi-send"></i></span>
-                            </div>
-                        </form>
-                    </div>
-                </div>
+                        )}   
+                </div>                       
+                <div className="chat-input-holder">
+                    <form onSubmit={handleSubmit} className="chat-input-form">
+                        <textarea
+                            type="text"
+                            ref={textareaRef}
+                            className="chat-input-textarea"
+                            placeholder="Start Typing..."
+                            rows="1"
+                            value={inputValue}
+                            onChange={handleInputChange}
+                            onKeyDown={handleKeyDown}
+                            disabled={isLoading}
+                        />
+                        <div className="input-group-append" onClick={handleSubmit}>
+                            <span className="input-group-text send-icon"><i className="bi bi-send"></i></span>
+                        </div>
+                    </form>
+                </div>                
             </div>
         </div>
+    </div>
     );
 }
 

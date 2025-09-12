@@ -1,4 +1,94 @@
 /* @import "tailwindcss"; */
+html, body, #root {
+  height: 100%;
+  margin: 0;
+  padding: 0;
+}
+
+.homepage-container {
+  display: flex;
+  flex-direction: column; /* stack nav on top, panel below */
+  height: 100vh; /* full height */
+  margin: 0;
+  padding: 0;
+}
+.panel-container{
+  display: flex;
+  overflow: hidden; /* Prevent overall scrolling */
+  height: calc(100vh - 60px); /* Adjust based on header height */
+  flex: 1;
+}
+.header {
+    text-align: center;
+    background-color: #f5f5f5;
+    padding: 10px 20px;
+    position: relative;
+}
+
+.header-content {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.logout-link {
+    color: #007bff;
+    text-decoration: none;
+    font-weight: 500;
+    padding: 8px 16px;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+}
+
+.logout-link:hover {
+    color: #0056b3;
+    text-decoration: underline;
+    background-color: rgba(0, 123, 255, 0.1);
+}
+
+.app-title {
+    margin: 0;
+    flex: 1;
+    text-align: center;
+}
+.top-bar {
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
+  background-color: #2c3e50;
+  color: black;
+  padding: 10px 20px;
+}
+.sidemenu{
+  width: 260px;
+  background-color: #202123;
+  color: white;
+  padding: 40px;
+  font: 100% Arial, Helvetica, sans-serif;
+  overflow-y: auto; /* Make sidebar scrollable if needed */
+  flex-shrink: 0; /* Prevent sidebar from shrinking */
+}
+
+.chatbox {
+  overflow-y: hidden; /* Prevent chatbox from scrolling */
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  background-color: #f9f9f9;
+}
+.chat-log{
+  flex: 1;
+  border: 1px solid #ccc;
+  border-bottom-left-radius: 20px;
+  border-bottom-right-radius: 20px;
+  background-color: white;
+  text-align: left;
+  padding: 10px;
+  overflow-y: auto;
+  max-height: fit-content;
+} 
 .add-file{
   padding: 0.5rem 1rem;
   background-color: #333;
@@ -81,47 +171,24 @@
   font: optional;
 }
 
- .panel-container{
-  display: flex;
-  background-color:white;
-  position:absolute;
-  top:0;bottom:0;right:0;left:0;
-  text-align: center;
 
-}
-
-.sidemenu{
-  width: 260px;
-  background-color: #202123;
+.logout-button {
+  background: #e74c3c;
+  border: none;
+  padding: 8px 15px;
+  border-radius: 5px;
   color: white;
-  padding: 40px;
-  font: 100% Arial, Helvetica, sans-serif;
-
+  cursor: pointer;
 }
 
 
-.chatbox {  
-  padding: 0 0 50px 0;
-  color: white;
-  position: relative;
-  flex: 3;
-  
-}
-.chat-log{
-  border: 1px solid #ccc;
-  overflow: hidden;
-  border-bottom-left-radius: 20px;
-  border-bottom-right-radius: 20px;
-  background-color: #303030;
-  text-align: left;
-} 
 
 
 .chat-input-holder{
   border-top: 1px solid #ccc;
-  position: relative;
-  height: 11%;
+  padding: 10px;
   background-color: rgb(239 239 239);
+  flex-shrink: 0; /* Prevent input area from shrinking */
 
 }
 .chat-input-form{
@@ -143,28 +210,20 @@
   width: 1%;
   margin-bottom: 0;
 }
-.chat-input-textarea{
-  /* background-color: #303030;
-  width: 90%;
-  border-radius: 5px;
+.chat-input-textarea {
+  width: 100%;
+  min-height: 40px;
+  max-height: 200px; /* limit growth */
+  resize: none; /* disable manual resize */
+  overflow-y: auto;
   border: none;
-  margin: 12px;
+  padding: 10px;
+  font-size: 16px;
+  border-radius: 8px;
   outline: none;
-  box-shadow: 0 0 8px 0 rgba(0,0,0,0.25);
-  padding: 12px;
-  color: white;
-  font-size: 1.2em; */
-  border: none !important;
-  border-radius: 20px !important;
-  display: block;
-  height: calc(2.25rem + 2px);
-  padding: 0.375rem 0.75rem;
-  font-size: 1rem;
-  line-height: 1.5;
-  color: #495057;
-  background-color: #fff;
-  background-clip: padding-box;
-  transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+  box-sizing: border-box;
+  background-color: #52555b;
+  color: #ccc;
 }
 .input-group-text {
   background: transparent !important;

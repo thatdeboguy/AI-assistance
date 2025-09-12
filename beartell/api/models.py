@@ -25,7 +25,6 @@ class Document(models.Model):
     upload_time = models.DateTimeField(default=timezone.now)
     document_type = models.CharField(max_length=3, choices=DOCUMENT_TYPES)
     storage_path = models.CharField(max_length=512) #path in S3 MinIO
-    embedding = VectorField(dimensions=1536, null=True, blank=True)
     text_content = models.TextField(null=True, blank=True)    
 
     #configuring how the table behaves
@@ -39,6 +38,10 @@ class Document(models.Model):
 
     def __str__(self):
         return f"{self.file_name} {self.document_type}"
-
+class DocumentChunk(models.Model):
+    document = models.ForeignKey(Document, on_delete=models.CASCADE, related_name="chunks")
+    chunk_index = models.IntegerField()
+    content = models.TextField(null=True, blank=True)
+    embedding = VectorField(dimensions=1536, null=True, blank=True)
 
 
