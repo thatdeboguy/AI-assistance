@@ -25,5 +25,5 @@ urlpatterns = [
     path("api/token/", TokenObtainPairView.as_view(), name="get_token" ),
     path("api/token/refresh/", TokenRefreshView.as_view(), name="refresh"),
     path("api-auth", include("rest_framework.urls")),
-    path("api/", include("api.urls")), #This states that if we go to any route that has 'api/' an it's not included in the above then we check the following directory
+    path("api/", include("api.urls")), #This states that if we go to any route that has 'api/' and it's not included in the above then we check the following directory
 ]

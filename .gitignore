@@ -47,6 +47,5 @@ yarn-error.log*
 *.sln
 *.sw?
 # Ignore specific root-level files
-/docker-compose.yml
 /*.txt
 secrets/

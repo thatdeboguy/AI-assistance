@@ -111,7 +111,7 @@ DATABASES = {
         'NAME': os.getenv('DB_NAME'),
         'USER': os.getenv('DB_USER'),
         'PASSWORD': os.getenv('DB_PASSWORD'),
-        'HOST': 'localhost',  # Docker service name for PostgreSQL
+        'HOST': os.getenv("DB_HOST", "db"),  # Docker service name for PostgreSQL
         'PORT': '5432',
     }
 }

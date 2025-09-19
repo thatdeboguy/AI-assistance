@@ -11,7 +11,8 @@ WORKDIR /backend
 RUN apt-get update && apt-get install -y --no-install-recommends \
     build-essential \
     libpq-dev \
-    libmagic1 \  
+    libmagic1 \
+    netcat-openbsd \  
     && rm -rf /var/lib/apt/lists/*
 
 # Install Python dependencies

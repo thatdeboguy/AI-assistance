@@ -1,0 +1,87 @@
+services:
+  # PostgreSQL Database
+  db:
+    image: ankane/pgvector:latest
+    environment:
+      - POSTGRES_DB=${POSTGRES_DB}  # From .env
+      - POSTGRES_USER=${POSTGRES_USER} # From .env
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+    volumes:
+      - postgres_data:/var/lib/postgresql/data/
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    ports:
+      - "5432:5432"
+    networks:
+      - app-network
+
+  # MinIO Service
+  minio:
+    image: minio/minio
+    command: server /data --console-address ":9001"
+    environment:
+      - MINIO_ROOT_USER=${MINIO_ACCESS_KEY} # From .env
+      - MINIO_ROOT_PASSWORD=${MINIO_SECRET_KEY}
+    ports:
+      - "9000:9000"
+      - "9001:9001"
+    volumes:
+      - minio_data:/data
+    networks:
+      - app-network
+
+  # Django Backend
+  backend:
+    build:
+      context: ./beartell
+      dockerfile: Dockerfile
+    command: >
+      sh -c "
+      until nc -z db 5432; do
+        echo 'Waiting for Postgres...';
+        sleep 2;
+      done &&
+      python manage.py migrate &&
+      python manage.py runserver 0.0.0.0:8000"
+    volumes:
+      - ./beartell:/backend
+    env_file:
+      - ./beartell/.env
+    environment:
+      - DB_HOST=db
+      - DB_PORT=5432
+    ports:
+      - "8000:8000"
+    depends_on:
+      - db
+      - minio
+    networks:
+      - app-network
+
+  # React Frontend
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+    command: npm run dev -- --host 0.0.0.0 --port 3000
+    volumes:
+      - ./frontend:/frontend
+      - /frontend/node_modules
+    ports:
+      - "3000:3000"
+    environment:
+      - VITE_API_URL=http://localhost:8000
+    depends_on:
+      - backend
+    networks:
+      - app-network
+
+volumes:
+  postgres_data:
+  minio_data:
+
+  
+
+networks:
+  app-network:
+    driver: bridge
+    
