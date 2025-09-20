@@ -1,6 +1,5 @@
 from minio import Minio
 from minio.error import S3Error
-from django.conf import settings
 import os
 import pdfplumber
 import pytesseract
@@ -10,11 +9,11 @@ import io
 from dotenv import load_dotenv
 
 
-load_dotenv('.env.local')  # Load environment variables from .env file
+load_dotenv('.env')  # Load environment variables from .env file
 class MinIOClient:
     def __init__(self):
         self.client = Minio(
-            "localhost:9000",
+            "minio:9000", # Use Docker service name for MinIO
             access_key=os.getenv("MINIO_ACCESS_KEY"),
             secret_key=os.getenv("MINIO_SECRET_KEY"),
             secure=False  

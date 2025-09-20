@@ -1,4 +1,3 @@
-from django.shortcuts import render
 from django.contrib.auth.models import User
 from .minio_storage import MinIOClient
 from .serializers import Userserializer, DocumentSerializer, DocumentListSerializer
@@ -13,7 +12,6 @@ import os
 from django.utils import timezone
 from pgvector.django import L2Distance
 from .document_services import get_content, generate_embedding
-from PIL import Image
 from django.http import StreamingHttpResponse
 import json
 import time

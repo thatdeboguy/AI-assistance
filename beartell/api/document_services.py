@@ -1,15 +1,10 @@
-from pgvector.django import L2Distance
 import openai
-from .models import Document
-from minio import Minio, S3Error
-import os
 from django.conf import settings
-from .minio_storage import MinIOClient
 import tiktoken
 import PyPDF2
 from PIL import Image
 import pytesseract
-# from docx import Document
+from docx import Document
 import time 
 
 
@@ -68,14 +63,14 @@ def get_content(file_obj, document_type):
             for page in pdf_reader.pages:
                 text += page.extract_text() 
             embeddings = generate_embedding(text)
-        elif document_type == ('doc', 'docx'):
+        elif (document_type == 'doc'):
             doc = Document(file_obj)
             text = "\n".join(paragraph.text for paragraph in doc.paragraphs)
             embeddings = generate_embedding(text)
-        elif document_type == 'txt':
+        elif (document_type == 'txt'):
             text = file_obj.read().decode('utf-8')
             embeddings = generate_embedding(text)
-        elif document_type == 'img':
+        elif (document_type == 'img'):
             image = Image.open(file_obj)
             text = pytesseract.image_to_string(image)
             embeddings = generate_embedding(text)
