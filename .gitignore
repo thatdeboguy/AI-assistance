@@ -23,7 +23,8 @@ htmlcov/
 
 # Node/React (frontend)
 node_modules/
-.env*
+.env
+
 /.env.local
 /.env.development
 /.env.production
