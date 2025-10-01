@@ -21,7 +21,7 @@ An AI-powered chat application with:
 
 ### 1. Clone the repository (Docker)
 ```bash
-git clone https://github.com/your-username/ai-assistance.git
+git clone https://github.com/thatdeboguy/ai-assistance.git
 
 - create env files (check .env.example file)
 
